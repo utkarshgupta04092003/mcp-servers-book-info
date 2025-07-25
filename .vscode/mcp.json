@@ -5,6 +5,11 @@
             "command": "node",
             "args": ["build/index.js"]
         },
+        "taskManagement": { 
+            "type": "stdio",
+            "command": "node",
+            "args": ["build/tasks.js"]
+        },
 		
     },
     "inputs": []

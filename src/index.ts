@@ -12,10 +12,15 @@ const server = new McpServer({
   },
 });
 
-server.tool('getAllBookInfo', "Fetch all the books information", {
-  query: z.string().describe("category of the books"),
-  maxNumber: z.number().describe("Maximum no of books")
-}, fetchBooks)
+server.tool(
+  "getAllBookInfo",
+  "Fetch all the books information",
+  {
+    query: z.string().describe("category of the books"),
+    maxNumber: z.number().describe("Maximum no of books"),
+  },
+  fetchBooks
+);
 
 async function main() {
   const transport = new StdioServerTransport();
