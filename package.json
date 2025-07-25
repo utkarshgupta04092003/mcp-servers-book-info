@@ -1,0 +1,27 @@
+{
+  "name": "mcp-servers",
+  "version": "1.0.0",
+  "description": "all the mcp servers",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "check-types": "tsc --pretty --noEmit",
+    "dev": "tsc && node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "play": "ts-node src/playground.ts",
+    "inspector": "npx @modelcontextprotocol/inspector node build/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3"
+  }
+}
