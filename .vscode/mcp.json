@@ -1,16 +1,15 @@
 {
     "servers": {
-        "bookInformations": { 
+        "bookInformations": {
             "type": "stdio",
             "command": "node",
             "args": ["build/index.js"]
         },
-        "taskManagement": { 
+        "taskManagement": {
             "type": "stdio",
             "command": "node",
             "args": ["build/tasks.js"]
-        },
-		
+        }
     },
     "inputs": []
 }

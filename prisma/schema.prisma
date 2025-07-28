@@ -9,6 +9,7 @@ datasource db {
 
 model Todo {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  taskId      Int      @unique
   title       String
   description String?
   completed   Boolean  @default(false)
