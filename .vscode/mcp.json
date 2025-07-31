@@ -1,14 +1,11 @@
 {
     "servers": {
         "bookInformations": {
-            "type": "stdio",
-            "command": "node",
-            "args": ["build/index.js"]
+            "url": "http://127.0.0.1:3000/book-information/mcp"
         },
+
         "taskManagement": {
-            "type": "stdio",
-            "command": "node",
-            "args": ["build/tasks.js"]
+            "url": "http://127.0.0.1:3000/task-management/mcp"
         }
     },
     "inputs": []

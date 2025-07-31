@@ -1,4 +1,4 @@
-import { prisma } from '../helpers/db'
+import { prisma } from '../../helpers/db'
 
 interface TaskInput {
     title: string
@@ -46,7 +46,6 @@ export async function getAllTasks({
             date: true,
         },
     })
-    console.warn(`[INFO] Fetched all the task list of status: ${completed}: ${taskList}`)
     return {
         content: [{ type: 'text' as const, text: JSON.stringify(taskList) }],
     }
@@ -72,7 +71,6 @@ export async function createNewTask({ title, description, status, date }: TaskIn
             date: true,
         },
     })
-    console.warn(`[INFO] Created new task: ${createdTask}`)
     return {
         content: [
             {
