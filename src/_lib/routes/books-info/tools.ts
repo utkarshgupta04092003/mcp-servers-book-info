@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import z from 'zod'
-import { fetchBooks } from './fetchers'
+import { fetchBooks, listAllBooks } from './fetchers'
 
 export const initializeTool = (server: McpServer) => {
     server.registerTool(
@@ -16,5 +16,14 @@ export const initializeTool = (server: McpServer) => {
             },
         },
         fetchBooks
+    )
+    
+    server.registerTool(
+        'listAllBooks',
+        {
+            description: `List all available books without any filters or parameters. This provides a comprehensive list of books.`,
+            inputSchema: {},
+        },
+        listAllBooks
     )
 }
