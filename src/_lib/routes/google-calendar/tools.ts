@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import z from 'zod'
-import { createEvent, listAllCalendars, listCalendarEvents } from './fetchers'
+import { createEvent, deleteEvent, listAllCalendars, listCalendarEvents } from './fetchers'
 
 export const initializeTool = (server: McpServer) => {
     server.registerTool(
@@ -20,7 +20,7 @@ export const initializeTool = (server: McpServer) => {
                     .optional()
                     .describe('The ID of the calendar to list events from'),
                 timezone: z.string().optional().describe('The timezone of the calendar'),
-                //  add timezone and time interval in the params
+                //TODO:  add timezone and time interval in the params
             },
         },
         listCalendarEvents
@@ -74,5 +74,16 @@ export const initializeTool = (server: McpServer) => {
             },
         },
         createEvent
+    )
+    server.registerTool(
+        'deleteEvent',
+        {
+            description: `Today is ${new Date().toISOString()}. Delete any particular event based on the calendarId and eventId.`,
+            inputSchema: {
+                calendarId: z.string().describe('The ID of the calendar to delete the event from'),
+                eventId: z.string().describe('The ID of the event to delete'),
+            },
+        },
+        deleteEvent
     )
 }

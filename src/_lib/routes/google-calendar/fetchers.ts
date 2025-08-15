@@ -28,7 +28,7 @@ export async function listAllCalendars() {
     const auth = await authorize()
     const calendar = google.calendar({ version: 'v3', auth })
     const res = await calendar.calendarList.list()
-    const calendarData = (res.data.items ?? []).slice(0, 4).map((item) => ({
+    const calendarData = (res.data.items ?? []).map((item) => ({
         id: item.id,
         summary: item.summary,
         timeZone: item.timeZone,
@@ -76,6 +76,7 @@ export async function listCalendarEvents({ calendarId }: { calendarId?: string }
         const end = event?.end?.dateTime || event?.end?.date
         console.log(`${start} - ${event?.summary ?? 'NA'}`)
         eventDetails.push({
+            eventId: event.id,
             start,
             end,
             summary: event?.summary ?? 'NA',
@@ -173,6 +174,41 @@ export async function createEvent({
     }
 }
 
+export async function deleteEvent({
+    calendarId,
+    eventId,
+}: {
+    calendarId: string
+    eventId: string
+}) {
+    try {
+        const auth = await authorize()
+        const calendar = google.calendar({ version: 'v3', auth })
+        await calendar.events.delete({
+            calendarId,
+            eventId,
+        })
+        return {
+            content: [
+                {
+                    type: 'text' as const,
+                    text: 'Event deleted successfully.',
+                },
+            ],
+        }
+    } catch (error) {
+        return {
+            content: [
+                {
+                    type: 'text' as const,
+                    text: `Failed to delete event. Error: ${error}`,
+                },
+            ],
+            isError: true,
+        }
+    }
+}
+
 function loadSavedCredentialsIfExist() {
     try {
         const content = readFileSync(TOKEN_PATH) as any
@@ -212,19 +248,3 @@ export async function authorize() {
     }
     return client
 }
-
-// private async deleteEvent(
-//     client: OAuth2Client,
-//     args: DeleteEventInput
-// ): Promise<void> {
-//     try {
-//         const calendar = this.getCalendar(client);
-//         await calendar.events.delete({
-//             calendarId: args.calendarId,
-//             eventId: args.eventId,
-//             sendUpdates: args.sendUpdates,
-//         });
-//     } catch (error) {
-//         throw this.handleGoogleApiError(error);
-//     }
-// }
