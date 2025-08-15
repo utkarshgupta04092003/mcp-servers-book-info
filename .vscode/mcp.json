@@ -3,9 +3,11 @@
         "bookInformations": {
             "url": "http://127.0.0.1:3000/book-information/mcp"
         },
-
         "taskManagement": {
             "url": "http://127.0.0.1:3000/task-management/mcp"
+        },
+        "googleCalender": {
+            "url": "http://127.0.0.1:3000/google-calendar/mcp"
         }
     },
     "inputs": []
