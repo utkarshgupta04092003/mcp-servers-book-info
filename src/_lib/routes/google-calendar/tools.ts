@@ -30,10 +30,10 @@ export const initializeTool = (server: McpServer) => {
         {
             description: `Today is ${new Date().toISOString()}. Extract the necessary event details from the user's prompt and create a corresponding meetings/conferences in Google Calendar.`,
             inputSchema: {
-                query: z
+                calendarInfo: z
                     .string()
                     .optional()
-                    .describe(`Query describe the calendar to search for events`),
+                    .describe(`Calendar info describe the calendar to search for events`),
                 meetingTitle: z
                     .string()
                     .describe('A brief title that summarizes the purpose of the meeting'),
@@ -49,13 +49,13 @@ export const initializeTool = (server: McpServer) => {
                     .string()
                     .datetime()
                     .describe(
-                        'The exact start date and time of the meeting in UTC format (e.g.,30th july 9AM -> 2025-07-30T09:00:00Z)'
+                        'The exact start date and time of the meeting in UTC format (e.g.,30th july 9AM -> 2025-07-30T09:00:00Z), in case of holidays or any event that does not require time, 00:00 IST should be time.'
                     ),
                 endTime: z
                     .string()
                     .datetime()
                     .describe(
-                        'The exact end date and time of the meeting in UTC format (e.g., 30th july 10AM -> 2025-07-30T10:00:00Z)'
+                        'The exact end date and time of the meeting in UTC format (e.g., 30th july 10AM -> 2025-07-30T10:00:00Z) in case of holidays or any event that does not require time, 11:59 IST should be time.'
                     ),
                 attendees: z
                     .array(

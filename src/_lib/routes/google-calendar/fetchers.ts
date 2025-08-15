@@ -2,10 +2,10 @@ import { authenticate } from '@google-cloud/local-auth'
 import { readFileSync, writeFileSync } from 'fs'
 import { google } from 'googleapis'
 import * as path from 'path'
-import { convertUTCToIST, getCalendarIdFromQuery, getCalendarTimezone } from './helpers'
+import { getCalendarIdFromQuery, getCalendarTimezone } from './helpers'
 
 type CreateEventProps = {
-    query?: string | undefined
+    calendarInfo?: string | undefined
     meetingTitle: string
     meetingLocation?: string | undefined
     description?: string | undefined
@@ -95,7 +95,7 @@ export async function listCalendarEvents({ calendarId }: { calendarId?: string }
 }
 
 export async function createEvent({
-    query,
+    calendarInfo,
     meetingTitle,
     meetingLocation,
     description,
@@ -104,7 +104,7 @@ export async function createEvent({
     attendees,
     isConference,
 }: CreateEventProps) {
-    let calendarId = await getCalendarIdFromQuery(query)
+    let calendarId = await getCalendarIdFromQuery(calendarInfo)
     let currentTimezone = await getCalendarTimezone(calendarId)
     const isIST = currentTimezone === 'Asia/Kolkata'
     const event = {
