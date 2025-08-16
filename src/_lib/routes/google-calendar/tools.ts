@@ -1,6 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import z from 'zod'
-import { createEvent, deleteEvent, listAllCalendars, listCalendarEvents } from './fetchers'
+import {
+    createEvent,
+    deleteEvent,
+    listAllCalendars,
+    listCalendarEvents,
+    searchEventByQuery,
+} from './fetchers'
 
 export const initializeTool = (server: McpServer) => {
     server.registerTool(
@@ -85,5 +91,16 @@ export const initializeTool = (server: McpServer) => {
             },
         },
         deleteEvent
+    )
+    server.registerTool(
+        'searchEventByQuery',
+        {
+            description: `Today is ${new Date().toISOString()}. Search/Get event information for events in the Google Calendar based on a query string.`,
+            inputSchema: {
+                calendarId: z.string().describe('The ID of the calendar to search within'),
+                query: z.string().describe('The search query string to find events'),
+            },
+        },
+        searchEventByQuery
     )
 }

@@ -1,7 +1,55 @@
+import { authenticate } from '@google-cloud/local-auth'
 import { formatInTimeZone } from 'date-fns-tz'
+import { readFileSync, writeFileSync } from 'fs'
 import Fuse from 'fuse.js'
 import { google } from 'googleapis'
-import { authorize } from './fetchers'
+import path from 'path'
+
+const SCOPES = [
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'https://www.googleapis.com/auth/calendar.events',
+]
+// Note: Everytime scopes are changed, token needs to be changed
+
+const TOKEN_PATH = path.join(process.cwd(), 'token.json')
+const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json')
+function loadSavedCredentialsIfExist() {
+    try {
+        const content = readFileSync(TOKEN_PATH) as any
+        const credentials = JSON.parse(content)
+        return google.auth.fromJSON(credentials)
+    } catch (err) {
+        return null
+    }
+}
+
+function saveCredentials(client: any) {
+    const content = readFileSync(CREDENTIALS_PATH) as any
+    const keys = JSON.parse(content)
+    const key = keys.installed || keys.web
+    const payload = JSON.stringify({
+        type: 'authorized_user',
+        client_id: key.client_id,
+        client_secret: key.client_secret,
+        refresh_token: client.credentials.refresh_token,
+    })
+    writeFileSync(TOKEN_PATH, payload)
+}
+
+export async function authorize() {
+    let client: any = loadSavedCredentialsIfExist()
+    if (client) {
+        return client
+    }
+    client = await authenticate({
+        scopes: SCOPES,
+        keyfilePath: CREDENTIALS_PATH,
+    })
+    if (client.credentials) {
+        saveCredentials(client)
+    }
+    return client
+}
 
 export async function getCalendarTimezone(calendarId: string | null | undefined): Promise<string> {
     try {
@@ -13,7 +61,6 @@ export async function getCalendarTimezone(calendarId: string | null | undefined)
         }
         return response.data.timeZone || 'UTC'
     } catch (error) {
-        console.log('error', error)
         return 'UTC'
     }
 }
@@ -59,23 +106,6 @@ export async function getCalendarIdFromQuery(query: string | undefined): Promise
         const calendarId = searchResults.length > 0 ? searchResults[0].item.id : undefined
         return calendarId ?? 'primary'
     } catch (error) {
-        console.log('error', error)
         return 'primary'
     }
 }
-
-// helper functions to get timezone
-// async function getCalendarDetails(
-//     calendarId: string
-// ): Promise<calendar_v3.Schema$CalendarListEntry> {
-//     try {
-//         const calendar = await authorize()
-//         const response = await calendar.calendarList.get({ calendarId })
-//         if (!response.data) {
-//             throw new Error(`Calendar ${calendarId} not found`)
-//         }
-//         return response.data
-//     } catch (error: any) {
-//         throw new Error(error)
-//     }
-// }

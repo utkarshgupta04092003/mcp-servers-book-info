@@ -12,7 +12,6 @@ router.post('/mcp', async (req, res) => {
     try {
         const sessionId = req.headers['mcp-session-id'] as string | undefined
         let transport: StreamableHTTPServerTransport
-        console.log(sessionId, transportMap[sessionId!])
         if (sessionId && transportMap[sessionId]) {
             transport = transportMap[sessionId]
         } else if (!sessionId && isInitializeRequest(req.body)) {
@@ -47,7 +46,6 @@ router.post('/mcp', async (req, res) => {
         }
         await transport.handleRequest(req, res, req.body)
     } catch (error) {
-        console.error('Error in /mcp POST handler:', error)
         if (!res.headersSent) {
             res.status(500).json({
                 jsonrpc: '2.0',

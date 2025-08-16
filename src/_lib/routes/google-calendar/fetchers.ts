@@ -1,8 +1,5 @@
-import { authenticate } from '@google-cloud/local-auth'
-import { readFileSync, writeFileSync } from 'fs'
 import { google } from 'googleapis'
-import * as path from 'path'
-import { getCalendarIdFromQuery, getCalendarTimezone } from './helpers'
+import { authorize, getCalendarIdFromQuery, getCalendarTimezone } from './helpers'
 
 type CreateEventProps = {
     calendarInfo?: string | undefined
@@ -15,15 +12,6 @@ type CreateEventProps = {
     isConference: boolean
 }
 
-const SCOPES = [
-    'https://www.googleapis.com/auth/calendar.readonly',
-    'https://www.googleapis.com/auth/calendar.events',
-]
-// Note: Everytime scopes are changed, token needs to be changed
-
-const TOKEN_PATH = path.join(process.cwd(), 'token.json')
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json')
-
 export async function listAllCalendars() {
     const auth = await authorize()
     const calendar = google.calendar({ version: 'v3', auth })
@@ -33,7 +21,6 @@ export async function listAllCalendars() {
         summary: item.summary,
         timeZone: item.timeZone,
     }))
-    console.log({ calendarData })
     return {
         content: [
             {
@@ -47,8 +34,6 @@ export async function listAllCalendars() {
 export async function listCalendarEvents({ calendarId }: { calendarId?: string }) {
     const auth = await authorize()
     const calendar = google.calendar({ version: 'v3', auth })
-
-    console.log(calendarId)
     const eventLists = await calendar.events.list({
         calendarId,
         timeMin: new Date().toISOString(),
@@ -56,10 +41,8 @@ export async function listCalendarEvents({ calendarId }: { calendarId?: string }
         singleEvents: true,
         orderBy: 'startTime',
     })
-
     const events = eventLists.data.items || []
     if (events.length === 0) {
-        console.log('No upcoming events found.')
         return {
             content: [
                 {
@@ -69,12 +52,10 @@ export async function listCalendarEvents({ calendarId }: { calendarId?: string }
             ],
         }
     }
-    console.log('Upcoming events:')
     const eventDetails: any[] = []
     events.map((event) => {
         const start = event?.start?.dateTime || event?.start?.date
         const end = event?.end?.dateTime || event?.end?.date
-        console.log(`${start} - ${event?.summary ?? 'NA'}`)
         eventDetails.push({
             eventId: event.id,
             start,
@@ -84,7 +65,6 @@ export async function listCalendarEvents({ calendarId }: { calendarId?: string }
             htmlLink: event?.htmlLink,
         })
     })
-    console.log(eventDetails)
     return {
         content: [
             {
@@ -142,7 +122,6 @@ export async function createEvent({
               }
             : {}),
     }
-    console.dir({ event }, { depth: null })
     const auth = await authorize()
     const calendar = google.calendar({ version: 'v3', auth })
     try {
@@ -161,7 +140,6 @@ export async function createEvent({
             ],
         }
     } catch (err) {
-        console.log('There was an error contacting the Calendar service:', err)
         return {
             content: [
                 {
@@ -209,42 +187,40 @@ export async function deleteEvent({
     }
 }
 
-function loadSavedCredentialsIfExist() {
+export async function searchEventByQuery({
+    calendarId,
+    query,
+}: {
+    calendarId: string
+    query: string
+}) {
     try {
-        const content = readFileSync(TOKEN_PATH) as any
-        const credentials = JSON.parse(content)
-        return google.auth.fromJSON(credentials)
-    } catch (err) {
-        return null
+        const auth = await authorize()
+        const calendar = google.calendar({ version: 'v3', auth })
+        const response = await calendar.events.list({
+            calendarId,
+            q: query,
+        })
+        const events = response.data.items ?? []
+        return {
+            content: [
+                {
+                    type: 'text' as const,
+                    text: `Found ${
+                        events.length
+                    } events matching query "${query}": ${JSON.stringify(events)}`,
+                },
+            ],
+        }
+    } catch (error) {
+        return {
+            content: [
+                {
+                    type: 'text' as const,
+                    text: `Failed to search events. Error: ${error}`,
+                },
+            ],
+            isError: true,
+        }
     }
-}
-
-function saveCredentials(client: any) {
-    const content = readFileSync(CREDENTIALS_PATH) as any
-    const keys = JSON.parse(content)
-    const key = keys.installed || keys.web
-    const payload = JSON.stringify({
-        type: 'authorized_user',
-        client_id: key.client_id,
-        client_secret: key.client_secret,
-        refresh_token: client.credentials.refresh_token,
-    })
-    writeFileSync(TOKEN_PATH, payload)
-}
-
-// move this to helpers
-export async function authorize() {
-    let client: any = loadSavedCredentialsIfExist()
-    if (client) {
-        console.log('Already authenticated, returning client')
-        return client
-    }
-    client = await authenticate({
-        scopes: SCOPES,
-        keyfilePath: CREDENTIALS_PATH,
-    })
-    if (client.credentials) {
-        saveCredentials(client)
-    }
-    return client
 }
