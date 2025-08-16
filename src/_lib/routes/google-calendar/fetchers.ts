@@ -87,17 +87,16 @@ export async function createEvent({
 }: CreateEventProps) {
     let calendarId = await getCalendarIdFromQuery(calendarInfo)
     let currentTimezone = await getCalendarTimezone(calendarId)
-    const isIST = currentTimezone === 'Asia/Kolkata'
     const event = {
         summary: meetingTitle,
         location: meetingLocation ?? '',
         description: description ?? '',
         start: {
-            dateTime: isIST ? startTime : startTime,
+            dateTime: startTime,
             timeZone: currentTimezone,
         },
         end: {
-            dateTime: isIST ? endTime : endTime,
+            dateTime: endTime,
             timeZone: currentTimezone,
         },
         // recurrence: ['RRULE:FREQ=DAILY;COUNT=1'],

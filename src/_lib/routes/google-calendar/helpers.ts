@@ -15,7 +15,7 @@ const TOKEN_PATH = path.join(process.cwd(), 'token.json')
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json')
 function loadSavedCredentialsIfExist() {
     try {
-        const content = readFileSync(TOKEN_PATH) as any
+        const content = readFileSync(TOKEN_PATH, 'utf8') as any
         const credentials = JSON.parse(content)
         return google.auth.fromJSON(credentials)
     } catch (err) {
@@ -24,7 +24,7 @@ function loadSavedCredentialsIfExist() {
 }
 
 function saveCredentials(client: any) {
-    const content = readFileSync(CREDENTIALS_PATH) as any
+    const content = readFileSync(CREDENTIALS_PATH, 'utf8') as any
     const keys = JSON.parse(content)
     const key = keys.installed || keys.web
     const payload = JSON.stringify({
