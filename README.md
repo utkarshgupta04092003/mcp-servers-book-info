@@ -9,8 +9,8 @@ The project follows a modular architecture:
 ```bash
 src/
 ├──_lib/
-|  ├── helpers/
-|  |   └── db.ts               # Reusable helpers for use across multiple servers
+│  ├── helpers/
+│  │   └── db.ts               # Reusable helpers for use across multiple servers
 │  └── routes/                 # Each MCP server is added here
 │      ├── google-calendar/    # Google Calendar MCP server
 │      │   ├── fetchers.ts
@@ -44,8 +44,8 @@ This makes it easy to add new MCP servers — just add a new folder under `route
 Each server has its own detailed README under the [`instructions/`](./instructions) directory.
 
 -   📅 [Google Calendar MCP Server](./instructions/google-calendar.md)
--   📚 [Books Info MCP Server](./instructions/books-info.md)
--   ✅ [Tasks MCP Server](./instructions/mcp-tasks.md)
+-   ✅ [Tasks MCP Server](./instructions/task-management.md)
+-   📚 [Books Info MCP Server](./instructions/book-info.md)
 
 ## 🛠️ Installation
 
